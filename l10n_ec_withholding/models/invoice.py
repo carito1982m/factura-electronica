@@ -5,15 +5,15 @@
 
 import logging
 
-from openerp import (
+from odoo import (
     api,
     fields,
     models
 )
-from openerp.exceptions import (
+from odoo.exceptions import (
     Warning as UserError
 )
-import openerp.addons.decimal_precision as dp
+import odoo.addons.decimal_precision as dp
 
 # mapping invoice type to journal type
 TYPE2JOURNAL = {
@@ -37,10 +37,15 @@ class Invoice(models.Model):
         inv_type = self._context.get('type', 'out_invoice')
         inv_types = inv_type if isinstance(inv_type, list) else [inv_type]
         company_id = self._context.get('company_id', self.env.user.company_id.id)  # noqa
+        # domain = [
+        #     ('type', 'in', filter(None, map(TYPE2JOURNAL.get, inv_types))),
+        #     ('company_id', '=', company_id),
+        # ]
+
         domain = [
-            ('type', 'in', filter(None, map(TYPE2JOURNAL.get, inv_types))),
-            ('company_id', '=', company_id),
-        ]
+              ('company_id', '=', company_id),
+         ]
+
         return self.env['account.journal'].search(domain, limit=1)
 
     @api.multi
@@ -64,10 +69,7 @@ class Invoice(models.Model):
         """
         Método para imprimir reporte de retencion
         """
-        return self.env['report'].get_action(
-            self.move_id,
-            'l10n_ec_withholding.account_withholding_report'
-        )
+        return self.env['report'].get_action(self.move_id,'l10n_ec_withholding.account_withholding_report')
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id')  # noqa
@@ -285,7 +287,7 @@ class Invoice(models.Model):
             raise UserError(_("Invoice must be in draft or Pro-forma state in order to validate it."))  # noqa
         to_open_invoices.action_date_assign()
         to_open_invoices.action_move_create()
-        to_open_invoices.action_number()
+        #to_open_invoices.action_number() # carito verificar
         to_open_invoices.action_withholding_create()
         return to_open_invoices.invoice_validate()
 

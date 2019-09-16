@@ -65,8 +65,12 @@ class AccountAuthorisation(models.Model):
         """
         if not self.expiration_date:
             return
-        now = datetime.strptime(time.strftime("%Y-%m-%d"), '%Y-%m-%d')
-        due_date = datetime.strptime(self.expiration_date, '%Y-%m-%d')
+        # now = datetime.strptime(time.strftime("%Y-%m-%d"), '%Y-%m-%d')
+        # due_date = datetime.strptime(self.expiration_date, '%Y-%m-%d')
+        # self.active = now < due_date
+
+        now = datetime.now()
+        due_date = self.expiration_date
         self.active = now < due_date
 
     def _get_type(self):
@@ -98,7 +102,7 @@ class AccountAuthorisation(models.Model):
             typ = self.env['account.ats.doc'].browse(values['type_id'])
             name_type = '{0}_{1}'.format(values['name'], values['type_id'])
             sequence_data = {
-                'code': typ.code == '07' and 'account.retention' or 'account.invoice',  # noqa
+                'code': typ.code == '07' and 'account.retention' or 'account.invoice',
                 'name': name_type,
                 'padding': 9,
                 'number_next': values['num_start'],
@@ -123,7 +127,7 @@ class AccountAuthorisation(models.Model):
     num_start = fields.Integer('Desde')
     num_end = fields.Integer('Hasta')
     is_electronic = fields.Boolean('Documento Electrónico ?')
-    expiration_date = fields.Date('Fecha de Vencimiento')
+    expiration_date = fields.Datetime('Fecha de Vencimiento')
     active = fields.Boolean(
         compute='_compute_active',
         string='Activo',
@@ -226,14 +230,15 @@ class AccountInvoice(models.Model):
         super(AccountInvoice, self)._onchange_journal_id()
         if self.journal_id and self.type in self._DOCUMENTOS_EMISION:
             if self.type == 'out_invoice':
-                self.auth_inv_id = self.journal_id.auth_out_invoice_id
+               # self.auth_inv_id = self.journal_id.auth_out_invoice_id # CARITO VERIFICAR
+               self.auth_number = self.auth_inv_id.name
             elif self.type == 'out_refund':
                 self.auth_inv_id = self.journal_id.auth_out_refund_id
-            self.auth_number = not self.auth_inv_id.is_electronic and self.auth_inv_id.name  # noqa
-            number = '{0}'.format(
-                str(self.auth_inv_id.sequence_id.number_next_actual).zfill(9)
-            )
+            #self.auth_number = not self.auth_inv_id.is_electronic and self.auth_inv_id.name  # CARITO VERIFICAR
+            self.auth_number = self.auth_inv_id.name
+            number = '{0}'.format(str(self.auth_inv_id.sequence_id.number_next_actual).zfill(9))
             self.reference = number
+
 
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
@@ -277,8 +282,8 @@ class AccountInvoice(models.Model):
     internal_inv_number = fields.Char('Numero Interno', copy=False)
     auth_inv_id = fields.Many2one(
         'account.authorisation',
-        string='Establecimiento',
-        readonly=True,
+        string='EstablecimientoCar'
+        ,readonly=True,
         states={'draft': [('readonly', False)]},
         help='Autorizacion para documento',
         copy=False

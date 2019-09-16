@@ -5,7 +5,6 @@
     'author': 'Cristian Salamea',
     'category': 'Localization',
     'license': 'AGPL-3',
-    'complexity': 'normal',
     'data': [
         'security/ir.model.access.csv',
         'data/data_einvoice.xml',
@@ -16,7 +15,8 @@
         'views/report_einvoice.xml',
         'views/edocument_layouts.xml',
     ],
-    'depends': [
-        'l10n_ec_withholding',
+    'depends': ['base','l10n_ec_withholding',
     ]
+
+
 }

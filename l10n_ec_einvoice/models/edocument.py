@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import base64
-import StringIO
+from io import StringIO
+#import StringIO
 from datetime import datetime
 
-from openerp import api, fields, models
-from openerp.exceptions import Warning as UserError
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo import api, fields, models
+from odoo.exceptions import Warning as UserError
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 from . import utils
@@ -95,8 +96,10 @@ class Edocument(models.AbstractModel):
 
     def get_access_key(self, name):
         if name == 'account.invoice':
-            auth = self.company_id.partner_id.get_authorisation('out_invoice')
-            ld = self.date_invoice.split('-')
+            #auth = self.company_id.partner_id.get_authorisation('out_invoice') # CARITO VERIFICAR
+            #ld = self.date_invoice.split('-') # CARITO VERIFICAR
+            auth = "01"
+            ld = datetime.strftime(self.date_invoice, '%Y-%d-%m').split('-')
             numero = getattr(self, 'invoice_number')
         elif name == 'account.retention':
             auth = self.company_id.partner_id.get_authorisation('ret_in_invoice')  # noqa
@@ -163,8 +166,10 @@ class Edocument(models.AbstractModel):
             u'Los comprobantes electrónicos deben',
             u'enviarse con máximo 24h desde su emisión.']
         )
-        dt = datetime.strptime(date_invoice, '%Y-%m-%d')
-        days = (datetime.now() - dt).days
+        #dt = datetime.strptime(date_invoice, '%Y-%m-%d') # CARITO VERIFICAR
+        # days = (datetime.now() - dt).days # CARITO VERIFICAR
+        dt = datetime.strftime(date_invoice, '%Y-%d-%m')
+        days =(datetime.now() - datetime.strptime(dt, '%Y-%d-%m')).days
         if days > LIMIT_TO_SEND:
             raise UserError(MESSAGE_TIME_LIMIT)
 

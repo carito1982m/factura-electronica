@@ -56,7 +56,7 @@ class HrCalendarException(models.Model):
 class HrContract(models.Model):
 
     _name = 'hr.contract'
-    _inherit = ['hr.contract', 'mail.thread', 'ir.needaction_mixin']
+    _inherit = ['hr.contract', 'mail.thread']
 
     @api.multi
     def name_get(self):

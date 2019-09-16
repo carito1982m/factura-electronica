@@ -29,8 +29,7 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem action="action_report_tax_form_open" id="menu_action_tax_report" parent="account.menu_finance_legal_statement" sequence="200"/>
-
+        
 
         <record id="view_account_vat_partner_tree" model="ir.ui.view">
             <field name="name">view.account.vat.partner.tree</field>
@@ -77,6 +76,13 @@
             <field name="context">{'default_group_by_code': 1}</field>
         </record>
 
-        <menuitem action="action_report_vat_partner_tree" id="menu_action_vat_partner" parent="account.menu_finance_entries" sequence="200"/>
+		 <!--
+		<menuitem name ="menu_action_tax_report" action="action_report_tax_form_open" id="menu_action_tax_report" parent="account.menu_finance_legal_statement" />
+-->
+		
+		<menuitem name ="menu_action_tax_report" action="action_report_tax_form_open" id="menu_action_tax_report" parent="account.menu_finance_entries" />
+		<menuitem  name ="menu_action_vat_partner" action="action_report_vat_partner_tree" id="menu_action_vat_partner" parent="account.menu_finance_entries" />
+		
+		  
     </data>
 </odoo>

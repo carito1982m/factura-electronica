@@ -26,9 +26,12 @@
             name="l10n_ec_check_printing.reporte_cheque_pacifico"
             file="l10n_ec_check_printing.reporte_cheque_pacifico"
             />
-
+ <!--
         <record id="check_report_pacifico" model="ir.actions.report.xml">
-            <field name="paperformat_id" ref="check_ec_paperformat"/>
+           
+			 <field name="paperformat_id" ref="check_ec_paperformat"/>
+			
         </record>
+		-->
     </data>
 </odoo>

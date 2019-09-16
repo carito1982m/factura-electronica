@@ -2,6 +2,6 @@
 <odoo>
     <!-- consumidor final por defecto -->
     <function  id="partner_consumidor_final_default_set"
-               model="ir.values" name="set_default"
+               model="ir.default" name="set"
                eval="('pos.order', 'partner_id', ref('l10n_ec_partner.partner_consumidor_final'))"/>
 </odoo>

@@ -54,21 +54,35 @@ class Xades(object):
         Metodo que aplica la firma digital al XML
         TODO: Revisar return
         """
+        # xml_str = xml_document.encode('utf-8') # CARITO VERIFICAR
+        # JAR_PATH = 'firma/firmaXadesBes.jar'
+        # JAVA_CMD = 'java'
+        # firma_path = os.path.join(os.path.dirname(__file__), JAR_PATH)
+        # command = [
+        #     JAVA_CMD,
+        #     '-jar',
+        #     firma_path,
+        #     xml_str,
+        #     base64.b64encode(file_pk12),
+        #     base64.b64encode(password)
+        # ]
+
         xml_str = xml_document.encode('utf-8')
-        JAR_PATH = 'firma/firmaXadesBes.jar'
+        JAR_PATH = 'firma\\firmaXadesBes.jar'
         JAVA_CMD = 'java'
         firma_path = os.path.join(os.path.dirname(__file__), JAR_PATH)
         command = [
             JAVA_CMD,
             '-jar',
             firma_path,
-            xml_str,
-            base64.b64encode(file_pk12),
-            base64.b64encode(password)
-        ]
+            xml_str.decode(),
+            #base64.b64encode(open('C:/Prueba/TICGOBI.p12', 'rb').read()).decode(),
+            base64.b64encode(file_pk12.encode()).decode(),
+            base64.b64encode(password.encode()).decode()
+         ]
         try:
             logging.info('Probando comando de firma digital')
-            subprocess.check_output(command)
+            subprocess.check_output(command )
         except subprocess.CalledProcessError as e:
             returncode = e.returncode
             output = e.output

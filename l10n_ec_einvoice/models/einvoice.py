@@ -7,8 +7,8 @@ import itertools
 
 from jinja2 import Environment, FileSystemLoader
 
-from openerp import api, models
-from openerp.exceptions import Warning as UserError
+from odoo import api, models
+from odoo.exceptions import Warning as UserError
 
 from . import utils
 from ..xades.sri import DocumentXML
@@ -29,19 +29,22 @@ class AccountInvoice(models.Model):
         """
         """
         def fix_date(date):
-            d = time.strftime('%d/%m/%Y',
-                              time.strptime(date, '%Y-%m-%d'))
+            # d = time.strftime('%d/%m/%Y',time.strptime(date, '%Y-%m-%d')) # CARITO VERIFICAR
+            d = date. strftime('%d/%m/%Y')
             return d
 
         company = invoice.company_id
         partner = invoice.partner_id
         infoFactura = {
-            'fechaEmision': fix_date(invoice.date_invoice),
-            'dirEstablecimiento': company.street2,
+            'fechaEmision': fix_date(invoice.date_invoice), #CARITO VERIFICAR CAMBIAR FECHA A FORMATO DD/MM/AAAA
+            #'dirEstablecimiento': company.street2,#CARITO VERIFICAR
+            'dirEstablecimiento': 'DIRECCION ESTABLECIMIENTO',
             'obligadoContabilidad': 'SI',
             'tipoIdentificacionComprador': utils.tipoIdentificacion[partner.type_identifier],  # noqa
+            'guiaRemision': '001-001-000000001', # carito aumento
             'razonSocialComprador': partner.name,
             'identificacionComprador': partner.identifier,
+            'direccionComprador': partner.identifier, # carito aumento
             'totalSinImpuestos': '%.2f' % (invoice.amount_untaxed),
             'totalDescuento': '0.00',
             'propina': '0.00',
@@ -51,24 +54,37 @@ class AccountInvoice(models.Model):
             'valorRetIva': '{:.2f}'.format(invoice.taxed_ret_vatsrv+invoice.taxed_ret_vatb),  # noqa
             'valorRetRenta': '{:.2f}'.format(invoice.amount_tax_ret_ir)
         }
+        company.company_registry=True #CARITO VERIFICAR
         if company.company_registry:
             infoFactura.update({'contribuyenteEspecial':
                                 company.company_registry})
         else:
             raise UserError('No ha determinado si es contribuyente especial.')
-
+# CARITO VERIFICAR
+        # totalConImpuestos = []
+        # for tax in invoice.tax_line_ids:
+        #
+        #     if tax.group_id.code in ['vat', 'vat0', 'ice']:
+        #         totalImpuesto = {
+        #             'codigo': utils.tabla17[tax.group_id.code],
+        #             'codigoPorcentaje': utils.tabla18[tax.percent_report],
+        #             'baseImponible': '{:.2f}'.format(tax.base),
+        #             'tarifa': tax.percent_report,
+        #             'valor': '{:.2f}'.format(tax.amount)
+        #             }
+        #         totalConImpuestos.append(totalImpuesto)
+        #
+        # infoFactura.update({'totalConImpuestos': totalConImpuestos})
         totalConImpuestos = []
         for tax in invoice.tax_line_ids:
-            if tax.group_id.code in ['vat', 'vat0', 'ice']:
                 totalImpuesto = {
-                    'codigo': utils.tabla17[tax.group_id.code],
-                    'codigoPorcentaje': utils.tabla18[tax.percent_report],
+                    'codigo': utils.tabla17['vat'],
+                    'codigoPorcentaje': utils.tabla18['12'],
+                    'descuentoAdicional': '0',
                     'baseImponible': '{:.2f}'.format(tax.base),
-                    'tarifa': tax.percent_report,
-                    'valor': '{:.2f}'.format(tax.amount)
-                    }
+                    'valor': '{:.2f}'.format(tax.base)
+                }
                 totalConImpuestos.append(totalImpuesto)
-
         infoFactura.update({'totalConImpuestos': totalConImpuestos})
 
         compensaciones = False
@@ -122,12 +138,27 @@ class AccountInvoice(models.Model):
                 'descuento': '%.2f' % discount,
                 'precioTotalSinImpuesto': '%.2f' % (line.price_subtotal)
             }
+
+            # CARITO VERIFICAR
+            # impuestos = []
+            # for tax_line in line.invoice_line_tax_ids:
+            #     if tax_line.tax_group_id.code in ['vat', 'vat0', 'ice']:
+            #         impuesto = {
+            #             'codigo': utils.tabla17[tax_line.tax_group_id.code],
+            #             'codigoPorcentaje': utils.tabla18[tax_line.percent_report],  # noqa
+            #             'tarifa': tax_line.percent_report,
+            #             'baseImponible': '{:.2f}'.format(line.price_subtotal),
+            #             'valor': '{:.2f}'.format(line.price_subtotal *
+            #                                      tax_line.amount)
+            #         }
+            #         impuestos.append(impuesto)
+            # detalle.update({'impuestos': impuestos})
+
             impuestos = []
             for tax_line in line.invoice_line_tax_ids:
-                if tax_line.tax_group_id.code in ['vat', 'vat0', 'ice']:
                     impuesto = {
-                        'codigo': utils.tabla17[tax_line.tax_group_id.code],
-                        'codigoPorcentaje': utils.tabla18[tax_line.percent_report],  # noqa
+                        'codigo': utils.tabla17['vat'],
+                        'codigoPorcentaje': utils.tabla18['12'],  # noqa
                         'tarifa': tax_line.percent_report,
                         'baseImponible': '{:.2f}'.format(line.price_subtotal),
                         'valor': '{:.2f}'.format(line.price_subtotal *
@@ -186,10 +217,11 @@ class AccountInvoice(models.Model):
             inv_xml = DocumentXML(einvoice, obj.type)
             inv_xml.validate_xml()
             xades = Xades()
-            file_pk12 = obj.company_id.electronic_signature
+            file_pk12 = 'C:\\Prueba\\TICGOBI.p12' #obj.company_id.electronic_signature
             password = obj.company_id.password_electronic_signature
             signed_document = xades.sign(einvoice, file_pk12, password)
             ok, errores = inv_xml.send_receipt(signed_document)
+
             if not ok:
                 raise UserError(errores)
             auth, m = inv_xml.request_authorization(access_key)

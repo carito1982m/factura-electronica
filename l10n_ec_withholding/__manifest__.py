@@ -7,8 +7,7 @@
     'version': '10.0.1.0.0',
     'category': 'Generic Modules/Accounting',
     'license': 'AGPL-3',
-    'depends': [
-        'l10n_ec_authorisation',
+    'depends': ['l10n_ec_authorisation',
         'l10n_ec_tax',
     ],
     'author': 'Cristian Salamea <cristian.salamea@ayni.com.ec>',

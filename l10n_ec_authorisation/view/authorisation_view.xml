@@ -59,7 +59,7 @@
                 <xpath expr="//field[@name='journal_id']" position="after">
                     <field name="auth_inv_id" required="1" domain="[('partner_id','=',partner_id)]" options='{"no_open":True}'
                            context="{'default_partner_id': partner_id}"/>
-                </xpath>
+                    </xpath>
             </field>
         </record>
 
@@ -155,20 +155,15 @@
         <field name="model">account.authorisation</field>
         <field name="arch" type="xml">
             <search string="Buscar Autorizaciones">
-                <group>
-                    <filter icon="terp-camera_test" string="Activos" domain="[('active','=',True)]" help="Autorizaciones Activas"/>
-                    <separator orientation="vertical"/>
-                    <filter name="unpaid" icon="terp-gtk-media-pause" string="Inactivos" domain="[('active','=',False)]" help="Autorizaciones Inactivas"/>
-                    <separator orientation="vertical"/>
-                    <field name="name"/>
+			        <field name="name"/>
                     <field name="partner_id"/>
                     <field name="type_id"/>
-                </group>
-                <newline/>
-                <group expand="0" string="Agrupar por...">
-                    <filter string="Partner" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                    <separator orientation="vertical"/>
-                    <filter string="Tipo" domain="[]" context="{'group_by': 'type_id'}"/>
+					
+                <group expand="0" string="Group By">
+                    <filter string="Partner" name="partner" context="{'group_by':'partner_id'}"/>
+                    <filter string="Tipo"  name="tipo" context="{'group_by': 'type_id'}"/>
+					<filter string="Activos" name="activos"  help="Autorizaciones Activas"/>
+                    <filter string="Inactivos"  name="unpaid" help="Autorizaciones Inactivas"/>
                 </group>
             </search>
         </field>

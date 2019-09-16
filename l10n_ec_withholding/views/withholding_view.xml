@@ -44,8 +44,8 @@
                     <attribute name="string">Proveedor</attribute>
                 </xpath>
                 <xpath expr="//field[@name='amount_total']" position="replace">
-                    <field name="amount_pay" string="Total" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                    <field name="amount_tax_retention"/>
+                    <!--<field name="amount_pay" string="Total" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
+                    <!--<field name="amount_tax_retention"/>-->
                     <field name="amount_total" string="Total a Pagar" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 </xpath>
                 <xpath expr="//button[@name='action_invoice_open'][last()]" position="after">
@@ -114,15 +114,16 @@
                     </header>
                     <sheet>
                         <div class="oe_title">
-                            <h1>
-                                <label string="Retención Borrador" attrs="{'invisible': [('state','!=','draft')]}"/>
-                                <label string="Retención Generada" attrs="{'invisible': [('state','=','draft')]}"/>
-                                <field name="name" class="oe_inline" required="1"/>
-                            </h1>
+                                <label for="name" string="Retención Borrador" attrs="{'invisible': [('state','!=','draft')]}"/>
+                                <label for="name" string="Retención Generada" attrs="{'invisible': [('state','=','draft')]}"/>
+                                <h1>
+                                     <field name="name" class="oe_inline" required="1"/>
+                                </h1>
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" select="1" domain="[('supplier', '=', True)]" attrs="{'required':[('to_cancel','=',False)]}"/>
+                                 <field name="partner_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('supplier', '=', True)]"  attrs="{'required':[('to_cancel','=',False)]}"/>
+                                <!--<field name="partner_id" select="1" domain="[('supplier', '=', True)]" attrs="{'required':[('to_cancel','=',False)]}"/>-->
                                 <field name="invoice_id"
                                        domain="[('partner_id','=',partner_id),('type','=','in_invoice'),('retention_id','=',False)]"
                                        options="{'no_create': True, 'no_create_edit': True}"
@@ -178,17 +179,19 @@
                     </header>
                     <sheet>
                         <div class="oe_title">
-                            <h1>
-                                <label string="Retención Borrador" attrs="{'invisible': [('state','!=','draft')]}"/>
-                                <label string="Retención Generada" attrs="{'invisible': [('state','=','draft')]}"/>
-                            </h1>
+
+                                <label for="name" string="Retención Borrador" attrs="{'invisible': [('state','!=','draft')]}"/>
+                                <label for="name" string="Retención Generada" attrs="{'invisible': [('state','=','draft')]}"/>
+                                <h1>
+                                     <field name="name" class="oe_inline" required="1"/>
+                                </h1>
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id" domain="[('customer','=',True)]"
-				       options="{'no_create': True, 'no_create_edit': True}"
+                                <field name="partner_id" domain="[('customer','=',True)]" options="{'no_create': True, 'no_create_edit': True}"
                                        attrs="{'required':[('to_cancel','=',False)]}"/>
                                 <field name="name" placeholder="001001000234768"/>
+                                <field name="company_id"  domain="[('company_id','=',company_id)]"  />
                                 <field name="invoice_id"
                                        domain="[('partner_id','=',partner_id),('type','=','out_invoice'),('retention_id','=',False)]"
                                        options="{'no_create': True, 'no_create_edit': True}"
@@ -204,8 +207,7 @@
                         </group>
                         <notebook>
                             <page string="Impuestos">
-                                <field name="tax_ids"
-				       nolabel="1"
+                                <field name="tax_ids" nolabel="1"
                                        domain="[('invoice_id','=',invoice_id),('group_id.code','in',['ret_ir','ret_vat_b','ret_vat_srv'])]">
                                     <tree string="Impuestos Aplicados" edit="false">
                                         <field name="fiscal_year"/>

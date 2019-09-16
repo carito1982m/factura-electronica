@@ -18,6 +18,9 @@ from . import utils
 
 class AccountWithdrawing(models.Model):
     """ Implementacion de documento de retencion """
+    _name = 'account.retention'
+    _description = 'Withdrawing Documents'
+    _order = 'date DESC'
 
     @api.multi
     @api.depends('tax_ids.amount')
@@ -58,9 +61,7 @@ class AccountWithdrawing(models.Model):
 
     STATES_VALUE = {'draft': [('readonly', False)]}
 
-    _name = 'account.retention'
-    _description = 'Withdrawing Documents'
-    _order = 'date DESC'
+
 
     name = fields.Char(
         'Número',
@@ -177,7 +178,7 @@ class AccountWithdrawing(models.Model):
         )
     company_id = fields.Many2one(
         'res.company',
-        'Company',
+        string='Company',
         required=True,
         change_default=True,
         readonly=True,

@@ -7,8 +7,8 @@ import itertools
 
 from jinja2 import Environment, FileSystemLoader
 
-from openerp import models, api
-from openerp.exceptions import Warning as UserError
+from odoo import models, api
+from odoo.exceptions import Warning as UserError
 
 from . import utils
 from ..xades.sri import DocumentXML

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from StringIO import StringIO
+#from StringIO import StringIO
+from io import StringIO
 import base64
 import logging
 
@@ -66,12 +67,14 @@ class DocumentXML(object):
         """
         self.logger.info('Enviando documento para recepcion SRI')
         buf = StringIO()
-        buf.write(document)
-        buffer_xml = base64.encodestring(buf.getvalue())
+        buf.write(document.decode())
+        buffer_xml = buf.getvalue()
+        #buffer_xml = base64.encodestring(buf.getvalue())
 
         if not utils.check_service('prueba'):
             # TODO: implementar modo offline
-            raise 'Error SRI', 'Servicio SRI no disponible.'
+            #raise 'Error SRI', 'Servicio SRI no disponible.'
+            raise Exception('Error SRI', 'Servicio SRI no disponible.')
 
         client = Client(SriService.get_active_ws()[0])
         result = client.service.validarComprobante(buffer_xml)
